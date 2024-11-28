@@ -1,4 +1,5 @@
 import random
+import copy
 
 def update(matrix):
     for row in matrix:
@@ -19,6 +20,10 @@ def spawn(matrix):
             matrix[second_index[0]][second_index[1]] = 2
 
 def start(matrix): 
+    print("""
+2048!
+Use aswd and enter to play.
+          """)
     spawn(matrix)
     update(matrix)
 
@@ -33,14 +38,6 @@ def new_2(matrix):
     column = list[index][1]
     matrix[row][column] = 2
 
-def havent_won_yet(matrix):
-    for row in matrix:
-        for element in row:
-            if element == 2048:
-                return False
-            else:
-                return True
-
 def left_squish(matrix):
     for row in matrix:
         list = [0, 0, 0, 0]
@@ -54,33 +51,12 @@ def left_squish(matrix):
 def left(matrix): 
     left_squish(matrix)
     for row in matrix:
-        for i in range(1,5):
-            if i < 4:
-                if row[-i] == row[-i - 1]:
-                    row[-i] = row[-i] * 2
-                    row[-i-1] = 0 
-    left_squish(matrix)
-
-
-def right_squish(matrix):
-    for row in matrix:
-        list = [0, 0, 0, 0]
-        counter = -1
-        for i in range(1,5):
-            if row[-i] != 0:
-                list[counter] = row[-i]
-                counter = counter - 1
-        matrix[matrix.index(row)] = list
-
-def right(matrix): 
-    right_squish(matrix)
-    for row in matrix:
         for i in range(0,4):
-            if i  > 0:
-                if row[i] == row[i - 1]:
+            if i < 3:
+                if row[i] == row[i + 1]:
                     row[i] = row[i] * 2
-                    row[i-1] = 0 
-    right_squish(matrix)
+                    row[i+1] = 0 
+    left_squish(matrix)
 
 def transpose(matrix):
     row_one = []
@@ -97,6 +73,15 @@ def transpose(matrix):
     matrix[2] = row_three
     matrix[3] = row_four
 
+def reverse(matrix):
+    for row in matrix:
+        row.reverse()
+
+def right(matrix):
+    reverse(matrix)
+    left(matrix)
+    reverse(matrix)
+
 def up(matrix):
     transpose(matrix)
     left(matrix)
@@ -106,19 +91,54 @@ def up(matrix):
 
 def down(matrix):
     transpose(matrix)
-    right(matrix)
-    transpose(matrix)
-    transpose(matrix)
+    reverse(matrix)
+    left(matrix)
+    reverse(matrix)
     transpose(matrix)
 
-def havent_lost_yet(matrix):
-    list = []
-    for i in range(0,4):
-        for j in range(0,4):
-            if matrix[i][j] == 0:
-                list.append([i,j])
-    if len(list) == 0:
-        return False
-    else:
+def left_is_legal(matrix):
+    new = copy.deepcopy(matrix)
+    left(new)
+    if matrix != new:
         return True
+    else:
+        return False
 
+def right_is_legal(matrix):
+    new = copy.deepcopy(matrix)
+    right(new)
+    if matrix != new:
+        return True
+    else:
+        return False
+
+def up_is_legal(matrix):
+    new = copy.deepcopy(matrix)
+    up(new)
+    if matrix != new:
+        return True
+    else:
+        return False
+
+def down_is_legal(matrix):
+    new = copy.deepcopy(matrix)
+    down(new)
+    if matrix != new:
+        return True
+    else:
+        return False
+    
+def won(matrix):
+    for row in matrix:
+        for element in row:
+            if element == 2048:
+                return True
+    return False
+            
+def lost(matrix):
+    if (left_is_legal(matrix) == False and right_is_legal(matrix) == False and up_is_legal(matrix) == False and 
+    down_is_legal(matrix) == False):
+        return True
+    else:
+        return False
+        
